@@ -1,0 +1,26 @@
+body {
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  height: auto;
+}
+
+.board {
+  display: grid;
+  flex: 2;
+  grid-template-columns: repeat(8, 75px);
+  grid-template-rows: repeat(8, 75px);
+  margin: 75px auto auto auto;
+  gap: 5px;
+}
+
+.playerBlackStats {
+  flex: 1;
+}
+
+.playerWhiteStats {
+  flex: 1;
+}

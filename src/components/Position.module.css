@@ -1,0 +1,6 @@
+.position {
+  display: flex;
+  background-color: #00ad00;
+  justify-content: center;
+  align-items: center;
+}

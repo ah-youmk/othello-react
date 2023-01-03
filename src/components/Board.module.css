@@ -5,15 +5,19 @@ body {
 .container {
   display: flex;
   width: 100%;
-  height: auto;
+  height: 100vh;
+}
+
+.boardContainer {
+  display: flex;
 }
 
 .board {
   display: grid;
-  flex: 2;
+  height: 635px;
   grid-template-columns: repeat(8, 75px);
   grid-template-rows: repeat(8, 75px);
-  margin: 75px auto auto auto;
+  margin: auto;
   gap: 5px;
 }
 

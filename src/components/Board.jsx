@@ -27,20 +27,22 @@ export default function Board() {
     <>
       <div className={styles.container}>
         <div className={styles.playerBlackStats}></div>
-        <div className={styles.board}>
-          {rows.map((row, indexR) =>
-            columns.map((column, indexC) => {
-              const uniqueID = `${indexR}` + `${indexC}`;
-              return (
-                <Position
-                  key={uniqueID}
-                  column={column}
-                  row={row}
-                  players={[playerWhite, playerBlack]}
-                />
-              );
-            })
-          )}
+        <div className={styles.boardContainer}>
+          <div className={styles.board}>
+            {rows.map((row, indexR) =>
+              columns.map((column, indexC) => {
+                const uniqueID = `${indexR}` + `${indexC}`;
+                return (
+                  <Position
+                    key={uniqueID}
+                    column={column}
+                    row={row}
+                    players={[playerWhite, playerBlack]}
+                  />
+                );
+              })
+            )}
+          </div>
         </div>
         <div className={styles.playerWhiteStats}></div>
       </div>

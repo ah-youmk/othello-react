@@ -1,4 +1,4 @@
-export const Player = class {
+const Player = class {
   constructor(name, positions, type) {
     this.name = name;
     this.type = type;
@@ -15,3 +15,21 @@ export const Player = class {
     this.name = name;
   }
 };
+
+export const playerWhite = new Player(
+  'Player1',
+  [
+    { col: 4, row: 4 },
+    { col: 5, row: 5 },
+  ],
+  'white'
+);
+export const playerBlack = new Player(
+  'Player2',
+  [
+    { col: 4, row: 5 },
+    { col: 5, row: 4 },
+  ],
+  'black'
+);
+playerBlack.setTurn(true);

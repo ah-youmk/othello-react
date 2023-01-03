@@ -1,32 +1,30 @@
 import Position from './Position';
 import styles from './Board.module.css';
-import { Player } from '../playerStatus';
+import { playerBlack, playerWhite } from '../playerStatus';
 
 const columns = [1, 2, 3, 4, 5, 6, 7, 8];
 const rows = [1, 2, 3, 4, 5, 6, 7, 8];
-const playerWhite = new Player(
-  'Player1',
-  [
-    { col: 4, row: 4 },
-    { col: 5, row: 5 },
-  ],
-  'white'
-);
-const playerBlack = new Player(
-  'Player1',
-  [
-    { col: 4, row: 5 },
-    { col: 5, row: 4 },
-  ],
-  'black'
-);
-console.log(playerWhite);
 
 export default function Board() {
   return (
     <>
       <div className={styles.container}>
-        <div className={styles.playerBlackStats}></div>
+        <div className={styles.playerBlackStats}>
+          <div className={styles.playerStats}>
+            <div className={styles.playerName}>
+              <p>{playerBlack.name}</p>
+              <p>Current Score : {playerBlack.score}</p>
+            </div>
+            <div className={styles.playerTurn}>
+              {playerBlack.turn ? (
+                <p>{playerBlack.name}'s turn</p>
+              ) : (
+                <p>Wait for your turn</p>
+              )}
+            </div>
+          </div>
+        </div>
+
         <div className={styles.boardContainer}>
           <div className={styles.board}>
             {rows.map((row, indexR) =>
@@ -44,7 +42,22 @@ export default function Board() {
             )}
           </div>
         </div>
-        <div className={styles.playerWhiteStats}></div>
+
+        <div className={styles.playerWhiteStats}>
+          <div className={styles.playerStats}>
+            <div className={styles.playerName}>
+              <p>{playerWhite.name}</p>
+              <p>Current Score : {playerWhite.score}</p>
+            </div>
+            <div className={styles.playerTurn}>
+              {playerWhite.turn ? (
+                <p>{playerWhite.name}'s turn</p>
+              ) : (
+                <p>Wait for your turn</p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

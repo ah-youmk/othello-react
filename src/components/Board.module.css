@@ -22,9 +22,39 @@ body {
 }
 
 .playerBlackStats {
+  display: flex;
   flex: 1;
 }
 
 .playerWhiteStats {
+  display: flex;
   flex: 1;
+}
+
+.playerStats {
+  width: 80%;
+  height: 60vh;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.playerName {
+  width: 100%;
+  height: 30vh;
+  text-align: center;
+}
+
+.playerName p {
+  font-size: 1.5rem;
+}
+
+.playerTurn {
+  width: 100%;
+  height: 30vh;
+  text-align: center;
+}
+
+.playerTurn p {
+  font-size: 1.5rem;
 }

@@ -1,4 +1,4 @@
-const Player = class {
+export const Player = class {
   constructor(name, positions, type) {
     this.name = name;
     this.type = type;
@@ -14,10 +14,14 @@ const Player = class {
   setName(name) {
     this.name = name;
   }
+
+  setPositions(positions) {
+    this.positions = positions;
+  }
 };
 
 export const playerWhite = new Player(
-  'Player1',
+  'ali',
   [
     { col: 4, row: 4 },
     { col: 5, row: 5 },
@@ -25,7 +29,7 @@ export const playerWhite = new Player(
   'white'
 );
 export const playerBlack = new Player(
-  'Player2',
+  'mamad',
   [
     { col: 4, row: 5 },
     { col: 5, row: 4 },

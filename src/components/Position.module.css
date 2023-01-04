@@ -8,3 +8,12 @@
 .position:hover {
   cursor: pointer;
 }
+
+.piece {
+  width: 50%;
+  height: 50%;
+  background-color: #fff;
+  border-radius: 50%;
+  border: 0.1rem solid #000;
+  opacity: 0;
+}

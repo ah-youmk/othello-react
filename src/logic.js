@@ -1,25 +1,11 @@
 import { playerBlack, playerWhite } from './playerStatus.js';
 import _ from 'lodash';
 
-const pbRows = [];
-const pbCols = [];
-playerBlack.forEach((position) => {
-  pbRows.push(position.row);
-  pbCols.push(position.col);
-});
-
-const pwRows = [];
-const pwCols = [];
-playerWhite.forEach((position) => {
-  pwRows.push(position.row);
-  pwCols.push(position.col);
-});
-
 const contains = (arr, obj) => {
   let isThere = false;
-  arr.forEach((item) => {
+  for (const item of arr) {
     if (_.isEqual(item, obj)) isThere = true;
-  });
+  }
   return isThere;
 };
 
@@ -37,98 +23,48 @@ const calcSidePos = (position) => {
   return sidePos;
 };
 
-const calcScoreRow = (currentP, opponentP, sidePos, axis, pos) => {
-  let score = 0;
-  let isLegal = false;
-  const parameter = axis === 4 ? -1 : 1;
-  while (
-    !currentP.includes(sidePos[axis - 1].row) &&
-    opponentP.includes(sidePos[axis - 1].row) &&
-    sidePos.row > 1 &&
-    sidePos.row < 8
-  ) {
-    score++;
-    sidePos = calcSidePos({ col: pos.col, row: pos.row + parameter });
-  }
-  if (currentP.includes(sidePos[axis].row)) {
-    isLegal = true;
-  }
-  return [score, isLegal];
-};
-
-const calcScoreColumn = (currentP, opponentP, sidePos, axis, pos) => {
-  let score = 0;
-  let isLegal = false;
-  const parameter = axis === 2 ? -1 : 1;
-  while (
-    !currentP.includes(sidePos[axis - 1].col) &&
-    opponentP.includes(sidePos[axis - 1].col) &&
-    sidePos.col > 1 &&
-    sidePos.col < 8
-  ) {
-    score++;
-    sidePos = calcSidePos({ col: pos.col + parameter, row: pos.row });
-  }
-  if (currentP.includes(sidePos[axis].col)) {
-    isLegal = true;
-  }
-  return [score, isLegal];
-};
-
-const calcScoreDiameter = (type, sidePos, axis, pos) => {
+const calcScore = (type, sidePos, block) => {
   const currentPlayer = type === 'white' ? playerWhite : playerBlack;
   const opponentPlayer = type === 'white' ? playerBlack : playerWhite;
   let score = 0;
   let isLegal = false;
-  const parameter = axis === 2 ? -1 : 1;
   while (
-    !contains(currentPlayer, sidePos) &&
-    contains(opponentPlayer, sidePos) &&
-    sidePos.col > 1 &&
-    sidePos.col < 8 &&
-    sidePos.row > 1 &&
-    sidePos.col < 8
+    !contains(currentPlayer.positions, sidePos[block - 1]) &&
+    contains(opponentPlayer.positions, sidePos[block - 1]) &&
+    sidePos[block - 1].col > 1 &&
+    sidePos[block - 1].col < 8 &&
+    sidePos[block - 1].row > 1 &&
+    sidePos[block - 1].col < 8
   ) {
     score++;
-    sidePos = calcSidePos({ col: pos.col + parameter, row: pos.row });
+    sidePos = calcSidePos({
+      col: sidePos[block - 1].col,
+      row: sidePos[block - 1].row,
+    });
   }
-  if (currentP.includes(sidePos[axis].col)) {
+  if (contains(currentPlayer.positions, sidePos[block - 1]) && score > 0)
     isLegal = true;
-  }
   return [score, isLegal];
 };
 
 const checkLegalMoves = (pos, type) => {
-  let isLegal = 0;
-  let currentPRows;
-  let currentPCols;
-  let opponentPRows;
-  let opponentPCols;
-  if (type === 'white') {
-    currentPRows = pbRows;
-    currentPCols = pbCols;
-    opponentPRows = pwRows;
-    opponentPCols = pwCols;
-  } else {
-    currentPRows = pwRows;
-    currentPCols = pwCols;
-    opponentPRows = pbRows;
-    opponentPCols = pbCols;
-  }
   let sidePos = calcSidePos(pos);
 
-  if (calcScoreRow(currentPRows, opponentPRows, sidePos, 4, pos)[1]) isLegal++;
-  if (calcScoreRow(currentPRows, opponentPRows, sidePos, 5, pos)[1]) isLegal++;
-  if (calcScoreColumn(currentPCols, opponentPCols, sidePos, 2, pos)[1])
-    isLegal++;
-  if (calcScoreColumn(currentPCols, opponentPCols, sidePos, 7, pos)[1])
-    isLegal++;
+  if (calcScore(type, sidePos, 4)[1]) return true;
+  if (calcScore(type, sidePos, 5)[1]) return true;
+  if (calcScore(type, sidePos, 2)[1]) return true;
+  if (calcScore(type, sidePos, 7)[1]) return true;
+  if (calcScore(type, sidePos, 1)[1]) return true;
+  if (calcScore(type, sidePos, 8)[1]) return true;
+  if (calcScore(type, sidePos, 3)[1]) return true;
+  if (calcScore(type, sidePos, 6)[1]) return true;
+
+  return false;
 };
 
-const pbAvailbaleMoves = [];
-playerWhite.positions.forEach((position) => {
-  const sidePositions = calcSidePos(position);
-
+const calcPAvailbaleMoves = (sidePos) => {
+  const sidePositions = calcSidePos(sidePos);
+  const pAvailbaleMoves = [];
   sidePositions.forEach((sidePosition) => {
     if (
       contains(playerBlack.positions, sidePosition) ||
@@ -136,11 +72,19 @@ playerWhite.positions.forEach((position) => {
     ) {
       return;
     }
-    pbAvailbaleMoves.push(sidePosition);
+    pAvailbaleMoves.push(sidePosition);
   });
+  return pAvailbaleMoves;
+};
+
+let pbAvailbaleMoves = [];
+playerWhite.positions.forEach((position) => {
+  pbAvailbaleMoves = [...pbAvailbaleMoves, ...calcPAvailbaleMoves(position)];
 });
 
 const pbLegalMoves = [];
-pbAvailbaleMoves.forEach((pos) => {
-  if (checkLegalMoves(pos, playerBlack.type)) pbLegalMoves.push(pos);
-});
+for (const pos of pbAvailbaleMoves) {
+  if (checkLegalMoves(pos, playerBlack.type) && !contains(pbLegalMoves, pos)) {
+    pbLegalMoves.push(pos);
+  }
+}

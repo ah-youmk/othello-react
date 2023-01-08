@@ -28,10 +28,10 @@ const checkLegal = (sidePos, block, currentPlayer, opponentPlayer) => {
   while (
     !contains(currentPlayer.positions, sidePos[block - 1]) &&
     contains(opponentPlayer.positions, sidePos[block - 1]) &&
-    sidePos[block - 1].col > 1 &&
-    sidePos[block - 1].col < 8 &&
-    sidePos[block - 1].row > 1 &&
-    sidePos[block - 1].col < 8
+    sidePos[block - 1].col > 0 &&
+    sidePos[block - 1].col < 9 &&
+    sidePos[block - 1].row > 0 &&
+    sidePos[block - 1].col < 9
   ) {
     score++;
     sidePos = calcSidePos({
@@ -61,10 +61,10 @@ const calcScore = (sidePos, block, currentPlayer, opponentPlayer) => {
   while (
     !contains(tempCurrent.positions, sidePos[block - 1]) &&
     contains(tempOpponent.positions, sidePos[block - 1]) &&
-    sidePos[block - 1].col > 1 &&
-    sidePos[block - 1].col < 8 &&
-    sidePos[block - 1].row > 1 &&
-    sidePos[block - 1].col < 8
+    sidePos[block - 1].col > 0 &&
+    sidePos[block - 1].col < 9 &&
+    sidePos[block - 1].row > 0 &&
+    sidePos[block - 1].col < 9
   ) {
     addCurr.push(sidePos[block - 1]);
     removeOppo.push(sidePos[block - 1]);

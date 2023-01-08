@@ -20,9 +20,24 @@ export default function Board() {
   const [blackPlayer, setBlackPlayer] = useState(playerBlack);
   const [whitePlayer, setWhitePlayer] = useState(playerWhite);
   const [pLegalMoves, setPLegalMoves] = useState([]);
+  let divStyle;
 
-  if (pLegalMoves.length === 0 && blackPlayer.disc !== 30) {
-    console.log('turn not changed');
+  if (whitePlayer.disc <= 0 && blackPlayer.turn) {
+    whitePlayer.turn = false;
+    blackPlayer.turn = true;
+  }
+  if (blackPlayer.disc <= 0 && whitePlayer.turn) {
+    whitePlayer.turn = true;
+    blackPlayer.turn = false;
+  }
+  if (
+    pLegalMoves.length === 0 &&
+    blackPlayer.disc !== 30 &&
+    blackPlayer.disc !== 0 &&
+    whitePlayer.disc !== 30 &&
+    whitePlayer.disc !== 0
+  ) {
+    window.alert('turn not changed');
     if (blackPlayer.turn) {
       whitePlayer.turn = true;
       blackPlayer.turn = false;
@@ -35,22 +50,19 @@ export default function Board() {
   useEffect(() => {
     if (blackPlayer.disc === 0 && whitePlayer.disc === 0) {
       setHasEnded(true);
-      return blackPlayer.score > whitePlayer.score
-        ? blackPlayer.setHasWon(true)
-        : whitePlayer.setHasWon(true);
-    }
-    if (blackPlayer.score === 0 || whitePlayer.score === 0) {
-      setHasEnded(true);
-      return blackPlayer.score === 0
-        ? whitePlayer.setHasWon(true)
-        : blackPlayer.setHasWon(true);
-    }
-    if (blackPlayer.disc === 0 && whitePlayer.disc === 0) {
-      onSetHasEnded(true);
-      setDivStyle(stylesPositions.position);
+      divStyle = positionStyles.position;
       if (blackPlayer.disc > whitePlayer.disc) blackPlayer.hasWon = true;
       else whitePlayer.hasWon = true;
       return;
+    }
+    if (
+      (blackPlayer.disc <= 0 || whitePlayer.disc <= 0) &&
+      pLegalMoves.length === 0
+    ) {
+      setHasEnded(true);
+      return blackPlayer.score > whitePlayer.score
+        ? blackPlayer.setHasWon(true)
+        : whitePlayer.setHasWon(true);
     }
     if (blackPlayer.turn) {
       setPLegalMoves(() => playerLegalMoves(blackPlayer, whitePlayer));
@@ -75,25 +87,6 @@ export default function Board() {
     }
 
     if (blackPlayer.turn) {
-      if (blackPlayer.disc <= 0) {
-        const newBlackPlayer = new Player(
-          playerBlack.name,
-          playerBlack.positions,
-          playerBlack.type
-        );
-        const newWhitePlayer = new Player(
-          whitePlayer.name,
-          whitePlayer.positions,
-          whitePlayer.type
-        );
-        blackPlayer.setTurn(false);
-        whitePlayer.setTurn(true);
-        newBlackPlayer.setTurn(false);
-        newWhitePlayer.setTurn(true);
-        setBlackPlayer(newBlackPlayer);
-        setWhitePlayer(newWhitePlayer);
-        return;
-      }
       const result = calcScoresAll(
         { col: column, row: row },
         blackPlayer,
@@ -151,13 +144,8 @@ export default function Board() {
       blackPlayer.positions,
       blackPlayer.type
     );
-    if (whitePlayer.disc <= 0) {
-      newBlackPlayer.setTurn(true);
-      newWhitePlayer.setTurn(false);
-      setBlackPlayer(newBlackPlayer);
-      setWhitePlayer(newWhitePlayer);
-      return;
-    }
+    newWhitePlayer.setDisc(whitePlayer.disc - 1);
+    newBlackPlayer.setDisc(blackPlayer.disc);
     if (blackPlayer.disc <= 0) {
       newBlackPlayer.setTurn(false);
       newWhitePlayer.setTurn(true);
@@ -165,16 +153,10 @@ export default function Board() {
       setWhitePlayer(newWhitePlayer);
       return;
     }
-    newWhitePlayer.setDisc(whitePlayer.disc - 1);
-    newBlackPlayer.setDisc(blackPlayer.disc);
     newWhitePlayer.setTurn(false);
     newBlackPlayer.setTurn(true);
     setWhitePlayer(newWhitePlayer);
     setBlackPlayer(newBlackPlayer);
-  };
-
-  const onSetHasEnded = (value) => {
-    setHasEnded(value);
   };
 
   return (
@@ -187,7 +169,6 @@ export default function Board() {
             {rows.map((row, indexR) =>
               columns.map((column, indexC) => {
                 const uniqueID = `${indexR}` + `${indexC}`;
-                let divStyle;
                 if (
                   contains(pLegalMoves, { col: column, row: row }) &&
                   !hasEnded

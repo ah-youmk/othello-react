@@ -5,6 +5,17 @@
   align-items: center;
 }
 
+.previewPosition {
+  display: flex;
+  background-color: hsl(120, 21%, 51%);
+  justify-content: center;
+  align-items: center;
+}
+
+.previewPosition:hover {
+  cursor: pointer;
+}
+
 .position:hover {
   cursor: pointer;
 }

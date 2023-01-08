@@ -1,7 +1,6 @@
-import { playerBlack, playerWhite } from './playerStatus.js';
 import _ from 'lodash';
 
-const contains = (arr, obj) => {
+export const contains = (arr, obj) => {
   let isThere = false;
   for (const item of arr) {
     if (_.isEqual(item, obj)) isThere = true;
@@ -23,9 +22,7 @@ const calcSidePos = (position) => {
   return sidePos;
 };
 
-const calcScore = (type, sidePos, block) => {
-  const currentPlayer = type === 'white' ? playerWhite : playerBlack;
-  const opponentPlayer = type === 'white' ? playerBlack : playerWhite;
+const checkLegal = (sidePos, block, currentPlayer, opponentPlayer) => {
   let score = 0;
   let isLegal = false;
   while (
@@ -42,33 +39,199 @@ const calcScore = (type, sidePos, block) => {
       row: sidePos[block - 1].row,
     });
   }
-  if (contains(currentPlayer.positions, sidePos[block - 1]) && score > 0)
-    isLegal = true;
+
+  if (contains(currentPlayer.positions, sidePos[block - 1]) && score > 0) {
+    if (
+      sidePos[block - 1].row > 0 &&
+      sidePos[block - 1].row < 9 &&
+      sidePos[block - 1].col > 0 &&
+      sidePos[block - 1].col < 9
+    ) {
+      isLegal = true;
+    }
+  }
   return [score, isLegal];
 };
 
-const checkLegalMoves = (pos, type) => {
-  let sidePos = calcSidePos(pos);
+const calcScore = (sidePos, block, currentPlayer, opponentPlayer) => {
+  const tempCurrent = _.cloneDeep(currentPlayer);
+  const tempOpponent = _.cloneDeep(opponentPlayer);
+  const addCurr = [];
+  const removeOppo = [];
+  while (
+    !contains(tempCurrent.positions, sidePos[block - 1]) &&
+    contains(tempOpponent.positions, sidePos[block - 1]) &&
+    sidePos[block - 1].col > 1 &&
+    sidePos[block - 1].col < 8 &&
+    sidePos[block - 1].row > 1 &&
+    sidePos[block - 1].col < 8
+  ) {
+    addCurr.push(sidePos[block - 1]);
+    removeOppo.push(sidePos[block - 1]);
+    sidePos = calcSidePos({
+      col: sidePos[block - 1].col,
+      row: sidePos[block - 1].row,
+    });
+  }
 
-  if (calcScore(type, sidePos, 4)[1]) return true;
-  if (calcScore(type, sidePos, 5)[1]) return true;
-  if (calcScore(type, sidePos, 2)[1]) return true;
-  if (calcScore(type, sidePos, 7)[1]) return true;
-  if (calcScore(type, sidePos, 1)[1]) return true;
-  if (calcScore(type, sidePos, 8)[1]) return true;
-  if (calcScore(type, sidePos, 3)[1]) return true;
-  if (calcScore(type, sidePos, 6)[1]) return true;
-
-  return false;
+  return contains(tempCurrent.positions, sidePos[block - 1]) &&
+    addCurr.length > 0
+    ? {
+        addedCurr: addCurr,
+        removedOppo: removeOppo,
+      }
+    : { addedCurr: [], removedOppo: [] };
 };
 
-const calcPAvailbaleMoves = (sidePos) => {
+export const calcScoresAll = (pos, currentPlayer, opponentPlayer) => {
+  const sidePos = calcSidePos(pos);
+  let result = {};
+  let currentPlayerNewPositions = [...currentPlayer.positions];
+
+  result = calcScore(sidePos, 4, currentPlayer, opponentPlayer);
+  currentPlayerNewPositions = [
+    ...currentPlayerNewPositions,
+    ...result.addedCurr,
+  ];
+  for (const item of result.removedOppo) {
+    const index = opponentPlayer.positions.findIndex((position) =>
+      _.isEqual(position, item)
+    );
+    if (index > -1) {
+      opponentPlayer.positions.splice(index, 1);
+    }
+  }
+
+  result = calcScore(sidePos, 5, currentPlayer, opponentPlayer);
+  currentPlayerNewPositions = [
+    ...currentPlayerNewPositions,
+    ...result.addedCurr,
+  ];
+  for (const item of result.removedOppo) {
+    const index = opponentPlayer.positions.findIndex((position) =>
+      _.isEqual(position, item)
+    );
+    if (index > -1) {
+      opponentPlayer.positions.splice(index, 1);
+    }
+  }
+
+  result = calcScore(sidePos, 2, currentPlayer, opponentPlayer);
+  currentPlayerNewPositions = [
+    ...currentPlayerNewPositions,
+    ...result.addedCurr,
+  ];
+  for (const item of result.removedOppo) {
+    const index = opponentPlayer.positions.findIndex((position) =>
+      _.isEqual(position, item)
+    );
+    if (index > -1) {
+      opponentPlayer.positions.splice(index, 1);
+    }
+  }
+
+  result = calcScore(sidePos, 7, currentPlayer, opponentPlayer);
+  currentPlayerNewPositions = [
+    ...currentPlayerNewPositions,
+    ...result.addedCurr,
+  ];
+  for (const item of result.removedOppo) {
+    const index = opponentPlayer.positions.findIndex((position) =>
+      _.isEqual(position, item)
+    );
+    if (index > -1) {
+      opponentPlayer.positions.splice(index, 1);
+    }
+  }
+
+  result = calcScore(sidePos, 1, currentPlayer, opponentPlayer);
+  currentPlayerNewPositions = [
+    ...currentPlayerNewPositions,
+    ...result.addedCurr,
+  ];
+  for (const item of result.removedOppo) {
+    const index = opponentPlayer.positions.findIndex((position) =>
+      _.isEqual(position, item)
+    );
+    if (index > -1) {
+      opponentPlayer.positions.splice(index, 1);
+    }
+  }
+
+  result = calcScore(sidePos, 8, currentPlayer, opponentPlayer);
+  currentPlayerNewPositions = [
+    ...currentPlayerNewPositions,
+    ...result.addedCurr,
+  ];
+  for (const item of result.removedOppo) {
+    const index = opponentPlayer.positions.findIndex((position) =>
+      _.isEqual(position, item)
+    );
+    if (index > -1) {
+      opponentPlayer.positions.splice(index, 1);
+    }
+  }
+
+  result = calcScore(sidePos, 3, currentPlayer, opponentPlayer);
+  currentPlayerNewPositions = [
+    ...currentPlayerNewPositions,
+    ...result.addedCurr,
+  ];
+  for (const item of result.removedOppo) {
+    const index = opponentPlayer.positions.findIndex((position) =>
+      _.isEqual(position, item)
+    );
+    if (index > -1) {
+      opponentPlayer.positions.splice(index, 1);
+    }
+  }
+
+  result = calcScore(sidePos, 6, currentPlayer, opponentPlayer);
+  currentPlayerNewPositions = [
+    ...currentPlayerNewPositions,
+    ...result.addedCurr,
+  ];
+  for (const item of result.removedOppo) {
+    const index = opponentPlayer.positions.findIndex((position) =>
+      _.isEqual(position, item)
+    );
+    if (index > -1) {
+      opponentPlayer.positions.splice(index, 1);
+    }
+  }
+
+  return {
+    newCurrent: currentPlayerNewPositions,
+    newOpponent: opponentPlayer.positions,
+  };
+};
+
+export const checkLegalMoves = (pos, currentPlayer, opponentPlayer) => {
+  if (!(pos.row > 0 && pos.row < 9 && pos.col > 0 && pos.col < 9)) {
+    return false;
+  }
+  let isLegal = 0;
+  const sidePos = calcSidePos(pos);
+
+  if (checkLegal(sidePos, 4, currentPlayer, opponentPlayer)[1]) isLegal++;
+  if (checkLegal(sidePos, 5, currentPlayer, opponentPlayer)[1]) isLegal++;
+  if (checkLegal(sidePos, 2, currentPlayer, opponentPlayer)[1]) isLegal++;
+  if (checkLegal(sidePos, 7, currentPlayer, opponentPlayer)[1]) isLegal++;
+  if (checkLegal(sidePos, 1, currentPlayer, opponentPlayer)[1]) isLegal++;
+  if (checkLegal(sidePos, 8, currentPlayer, opponentPlayer)[1]) isLegal++;
+  if (checkLegal(sidePos, 3, currentPlayer, opponentPlayer)[1]) isLegal++;
+  if (checkLegal(sidePos, 6, currentPlayer, opponentPlayer)[1]) isLegal++;
+
+  return isLegal > 0 ? true : false;
+};
+
+export const calcPAvailbaleMoves = (sidePos, currentPlayer, opponentPlayer) => {
   const sidePositions = calcSidePos(sidePos);
   const pAvailbaleMoves = [];
   sidePositions.forEach((sidePosition) => {
     if (
-      contains(playerBlack.positions, sidePosition) ||
-      contains(playerWhite.positions, sidePosition)
+      contains(currentPlayer.positions, sidePosition) ||
+      contains(opponentPlayer.positions, sidePosition)
     ) {
       return;
     }
@@ -76,15 +239,3 @@ const calcPAvailbaleMoves = (sidePos) => {
   });
   return pAvailbaleMoves;
 };
-
-let pbAvailbaleMoves = [];
-playerWhite.positions.forEach((position) => {
-  pbAvailbaleMoves = [...pbAvailbaleMoves, ...calcPAvailbaleMoves(position)];
-});
-
-const pbLegalMoves = [];
-for (const pos of pbAvailbaleMoves) {
-  if (checkLegalMoves(pos, playerBlack.type) && !contains(pbLegalMoves, pos)) {
-    pbLegalMoves.push(pos);
-  }
-}

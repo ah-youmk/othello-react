@@ -1,55 +1,24 @@
-import { useState } from 'react';
-import { Player } from '../playerStatus';
 import Piece from './Piece';
-import styles from './Position.module.css';
 
 export default function Position({
   column,
   row,
   players,
-  isFilled,
-  onSetBlackPlayer,
-  onSetWhitePlayer,
-  blackPlayer,
-  whitePlayer,
+  updateBoard,
+  divStyle,
+  hasEnded,
 }) {
+  let isFilled = false;
   const clickHandler = (e) => {
     e.preventDefault();
-    if (isFilled) {
-      console.log('illegal move');
+    if (isFilled || hasEnded) {
       return;
     }
-    if (blackPlayer.turn) {
-      const newPositions = [
-        ...blackPlayer.positions,
-        { col: column, row: row },
-      ];
-      blackPlayer.setPositions(newPositions);
-      const newPlayer = new Player(
-        blackPlayer.name,
-        blackPlayer.positions,
-        blackPlayer.type
-      );
-      newPlayer.setTurn(false);
-      whitePlayer.setTurn(true);
-      onSetBlackPlayer(newPlayer);
-      return;
-    }
-
-    const newPositions = [...whitePlayer.positions, { col: column, row: row }];
-    whitePlayer.setPositions(newPositions);
-    const newPlayer = new Player(
-      whitePlayer.name,
-      whitePlayer.positions,
-      whitePlayer.type
-    );
-    newPlayer.setTurn(false);
-    blackPlayer.setTurn(true);
-    onSetWhitePlayer(newPlayer);
+    updateBoard(column, row);
   };
 
   return (
-    <div className={styles.position} onClick={clickHandler}>
+    <div className={divStyle} onClick={clickHandler}>
       {players.map((player) =>
         player.positions.map((position, index) => {
           if (!(position.col === column && position.row === row)) {

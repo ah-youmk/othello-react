@@ -5,6 +5,8 @@ export const Player = class {
     this.turn = false;
     this.positions = positions;
     this.score = positions.length;
+    this.disc = 30;
+    this.hasWon = false;
   }
 
   setTurn(turn) {
@@ -17,6 +19,14 @@ export const Player = class {
 
   setPositions(positions) {
     this.positions = positions;
+  }
+
+  setDisc(disc) {
+    this.disc = disc;
+  }
+
+  setHasWon(hasWon) {
+    this.hasWon = hasWon;
   }
 };
 

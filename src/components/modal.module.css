@@ -1,0 +1,158 @@
+.modal {
+  display: hidden;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  z-index: 1;
+  overflow: auto;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding-top: 120px;
+}
+
+.modal_content {
+  display: flex;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 50px;
+  border: 2px solid #000;
+  width: 75%;
+  height: 57vh;
+  box-shadow: rgb(0 0 0 / 20%) 0px 11px 15px -7px,
+    rgb(0 0 0 / 14%) 0px 24px 38px 3px, rgb(0 0 0 / 12%) 0px 9px 46px 8px;
+  align-items: center;
+}
+
+.ai_play {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-right: 1px solid #213547;
+  font-size: 35px;
+  flex: 1;
+  text-align: center;
+}
+
+.ai_info {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.ai_info_div_span {
+  font-size: 35px;
+}
+
+.ai_info div {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  font-size: 25px;
+}
+
+.ai_info div input {
+  width: 180px;
+  height: 20px;
+  border: 0px;
+  background-color: #f0f0f0;
+  padding: 10px 12px 8px;
+  border-bottom: 2px solid black;
+  transition: 0.14s all ease-in-out;
+}
+
+.ai_play div button {
+  font-family: 'Inter var experimental', 'Inter var', 'Inter', ui-sans-serif,
+    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Helvetica, Arial, 'Noto Sans', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  width: 120px;
+  height: 45px;
+  font-size: 20px;
+  font-weight: 200;
+  border: 1px solid #d1d1d1;
+  background-color: #f2f2f2;
+  border-radius: 20px;
+  transition: background-color 0.25s ease-in-out;
+}
+
+.ai_play div button:hover {
+  cursor: pointer;
+  background-color: #e5e5e5;
+  transition: background-color 0.25s ease-in-out;
+}
+
+.ai_info div input:hover {
+  background-color: #dfdfdf;
+}
+
+.ai_info div input:focus {
+  outline: 0;
+  background-color: #f0f0f0;
+  border-bottom: 2px solid #1976d2;
+}
+
+.two_player {
+  font-size: 25px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+}
+
+.player_info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.player_info div {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.player_info div input {
+  width: 180px;
+  height: 20px;
+  border: 0px;
+  background-color: #f0f0f0;
+  padding: 10px 12px 8px;
+  border-bottom: 2px solid black;
+  transition: 0.14s all ease-in-out;
+}
+
+.player_info div input:hover {
+  background-color: #dfdfdf;
+}
+
+.player_info div input:focus {
+  outline: 0;
+  background-color: #f0f0f0;
+  border-bottom: 2px solid #1976d2;
+}
+
+.player_info button {
+  font-family: 'Inter var experimental', 'Inter var', 'Inter', ui-sans-serif,
+    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Helvetica, Arial, 'Noto Sans', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  width: 120px;
+  height: 45px;
+  font-size: 20px;
+  font-weight: 200;
+  border: 1px solid #d1d1d1;
+  background-color: #f2f2f2;
+  border-radius: 20px;
+  transition: background-color 0.25s ease-in-out;
+}
+
+.player_info button:hover {
+  cursor: pointer;
+  background-color: #e5e5e5;
+  transition: background-color 0.25s ease-in-out;
+}

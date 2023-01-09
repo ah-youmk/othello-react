@@ -1,19 +1,8 @@
 .position {
   display: flex;
-  background-color: #00ad00;
+  background-color: #009900;
   justify-content: center;
   align-items: center;
-}
-
-.previewPosition {
-  display: flex;
-  background-color: hsl(120, 21%, 51%);
-  justify-content: center;
-  align-items: center;
-}
-
-.previewPosition:hover {
-  cursor: pointer;
 }
 
 .position:hover {

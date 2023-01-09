@@ -1,23 +1,22 @@
 import Position from './Position';
 import PlayerInfo from './PlayerInfo';
 import styles from './Board.module.css';
-import positionStyles from './Position.module.css';
 import { Player, playerBlack, playerWhite } from '../js/playerStatus';
 import { useState, useEffect } from 'react';
-import { contains, playerLegalMoves } from '../js/logic';
+import { playerLegalMoves } from '../js/logic';
 import updateState, { saveSession } from '../js/updateState';
+import StartPopup from './StartPopup';
 
 const columns = [1, 2, 3, 4, 5, 6, 7, 8];
 const rows = [1, 2, 3, 4, 5, 6, 7, 8];
-
-let isAi = false;
 
 export default function Board() {
   const [hasEnded, setHasEnded] = useState(false);
   const [blackPlayer, setBlackPlayer] = useState(playerBlack);
   const [whitePlayer, setWhitePlayer] = useState(playerWhite);
   const [pLegalMoves, setPLegalMoves] = useState([]);
-  let divStyle;
+  const [togglePopup, setTogglePopup] = useState(true);
+  const [isAi, setIsAi] = useState(false);
   let draw = false;
 
   if (blackPlayer.disc <= 0 && blackPlayer.turn) {
@@ -46,19 +45,20 @@ export default function Board() {
   useEffect(() => {
     if (blackPlayer.disc === 0 && whitePlayer.disc === 0) {
       setHasEnded(true);
-      divStyle = positionStyles.position;
+      setPLegalMoves([]);
       if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
       else if (blackPlayer.score < whitePlayer.score) whitePlayer.hasWon = true;
       else draw = true;
-      saveSession(whitePlayer, blackPlayer);
+      saveSession(whitePlayer, blackPlayer, isAi);
       return;
     }
     if (blackPlayer.score === 0 || whitePlayer.score === 0) {
       setHasEnded(true);
+      setPLegalMoves([]);
       if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
       else if (blackPlayer.score < whitePlayer.score) whitePlayer.hasWon = true;
       else draw = true;
-      saveSession(whitePlayer, blackPlayer);
+      saveSession(whitePlayer, blackPlayer, isAi);
       return;
     }
 
@@ -66,20 +66,22 @@ export default function Board() {
       const tempLegalMoves = playerLegalMoves(whitePlayer, blackPlayer);
       if (blackPlayer.disc <= 0 && tempLegalMoves.length === 0) {
         setHasEnded(true);
+        setPLegalMoves([]);
         if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
         else if (blackPlayer.score < whitePlayer.score)
           whitePlayer.hasWon = true;
         else draw = true;
-        saveSession(whitePlayer, blackPlayer);
+        saveSession(whitePlayer, blackPlayer, isAi);
         return;
       }
       if (pLegalMoves.length <= 0 && tempLegalMoves.length === 0) {
         setHasEnded(true);
+        setPLegalMoves([]);
         if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
         else if (blackPlayer.score < whitePlayer.score)
           whitePlayer.hasWon = true;
         else draw = true;
-        saveSession(whitePlayer, blackPlayer);
+        saveSession(whitePlayer, blackPlayer, isAi);
         return;
       }
       setPLegalMoves(() => playerLegalMoves(blackPlayer, whitePlayer));
@@ -87,25 +89,32 @@ export default function Board() {
       const tempLegalMoves = playerLegalMoves(blackPlayer, whitePlayer);
       if (whitePlayer.disc <= 0 && tempLegalMoves.length === 0) {
         setHasEnded(true);
+        setPLegalMoves([]);
         if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
         else if (blackPlayer.score < whitePlayer.score)
           whitePlayer.hasWon = true;
         else draw = true;
-        saveSession(whitePlayer, blackPlayer);
+        saveSession(whitePlayer, blackPlayer, isAi);
         return;
       }
       if (pLegalMoves.length <= 0 && tempLegalMoves.length === 0) {
         setHasEnded(true);
+        setPLegalMoves([]);
         if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
         else if (blackPlayer.score < whitePlayer.score)
           whitePlayer.hasWon = true;
         else draw = true;
-        saveSession(whitePlayer, blackPlayer);
+        saveSession(whitePlayer, blackPlayer, isAi);
         return;
       }
       setPLegalMoves(() => playerLegalMoves(whitePlayer, blackPlayer));
     }
-    if (sessionStorage.getItem('playerwPositions')) {
+    if (
+      sessionStorage.getItem('playerwPositions') ||
+      JSON.parse(sessionStorage.getItem('togglePopup'))
+    ) {
+      setIsAi(JSON.parse(sessionStorage.getItem('isAi')));
+      setTogglePopup(!JSON.parse(sessionStorage.getItem('togglePopup')));
       const newWhite = new Player(
         sessionStorage.getItem('playerwName'),
         JSON.parse(sessionStorage.getItem('playerwPositions')),
@@ -116,7 +125,10 @@ export default function Board() {
       newWhite.setHasWon(JSON.parse(sessionStorage.getItem('playerwHasWon')));
       setWhitePlayer(newWhite);
     }
-    if (sessionStorage.getItem('playerbPositions')) {
+    if (
+      sessionStorage.getItem('playerbPositions') ||
+      JSON.parse(sessionStorage.getItem('togglePopup'))
+    ) {
       const newBlack = new Player(
         sessionStorage.getItem('playerbName'),
         JSON.parse(sessionStorage.getItem('playerbPositions')),
@@ -142,50 +154,72 @@ export default function Board() {
   return (
     <>
       <div className={styles.container}>
-        <PlayerInfo player={blackPlayer} hasEnded={hasEnded} draw={draw} />
+        <PlayerInfo
+          player={blackPlayer}
+          hasEnded={hasEnded}
+          draw={draw}
+          playerDiv={styles.playerBlackStats}
+        />
 
         <div className={styles.boardContainer}>
-          <div className={styles.board}>
-            {rows.map((row, indexR) =>
-              columns.map((column, indexC) => {
-                const uniqueID = `${indexR}` + `${indexC}`;
-                if (
-                  contains(pLegalMoves, { col: column, row: row }) &&
-                  !hasEnded
-                ) {
-                  divStyle = positionStyles.previewPosition;
-                } else {
-                  divStyle = positionStyles.position;
-                }
-                return (
-                  <Position
-                    key={uniqueID}
-                    column={column}
-                    row={row}
-                    players={[whitePlayer, blackPlayer]}
-                    updateBoard={(column, row) =>
-                      updateState(
-                        whitePlayer,
-                        blackPlayer,
-                        pLegalMoves,
-                        column,
-                        row,
-                        isAi,
-                        setBlackPlayer,
-                        setWhitePlayer
-                      )
-                    }
-                    divStyle={divStyle}
-                    hasEnded={hasEnded}
-                  />
-                );
-              })
-            )}
+          <div className={styles.newGame}>
+            <button
+              onClick={() => {
+                setTogglePopup(true);
+              }}
+            >
+              New Game
+            </button>
+          </div>
+          <div className={styles.boardLayout}>
+            <div className={styles.board}>
+              {rows.map((row, indexR) =>
+                columns.map((column, indexC) => {
+                  const uniqueID = `${indexR}` + `${indexC}`;
+                  return (
+                    <Position
+                      key={uniqueID}
+                      column={column}
+                      row={row}
+                      players={[whitePlayer, blackPlayer]}
+                      updateBoard={(column, row) =>
+                        updateState(
+                          whitePlayer,
+                          blackPlayer,
+                          pLegalMoves,
+                          column,
+                          row,
+                          isAi,
+                          setBlackPlayer,
+                          setWhitePlayer
+                        )
+                      }
+                      pLegalMoves={pLegalMoves}
+                      hasEnded={hasEnded}
+                      playerblackTurn={blackPlayer.turn}
+                    />
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
 
-        <PlayerInfo player={whitePlayer} hasEnded={hasEnded} draw={draw} />
+        <PlayerInfo
+          player={whitePlayer}
+          hasEnded={hasEnded}
+          draw={draw}
+          playerDiv={styles.playerWhiteStats}
+        />
       </div>
+      {togglePopup ? (
+        <StartPopup
+          setTogglePopup={setTogglePopup}
+          setBlackPlayer={setBlackPlayer}
+          setWhitePlayer={setWhitePlayer}
+          setIsAi={setIsAi}
+        />
+      ) : null}
     </>
   );
 }

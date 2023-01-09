@@ -1,32 +1,30 @@
 import styles from './Board.module.css';
 
-export default function PlayerInfo({ player, hasEnded, draw }) {
-  const playerWon = <p>{player.name} has won</p>;
-  const playerLost = <p>{player.name} has lost</p>;
+export default function PlayerInfo({ player, hasEnded, draw, playerDiv }) {
+  const playerWon = <div>{player.name} has won</div>;
+  const playerLost = <div>{player.name} has lost</div>;
   return (
     <>
-      <div className={styles.playerBlackStats}>
+      <div className={playerDiv}>
         <div className={styles.playerStats}>
           <div className={styles.playerName}>
-            <p>
+            <div>
               {player.name} is {player.type}
-            </p>
-            <p>Remaining discs : {player.disc}</p>
-            <p>Score : {player.score}</p>
-            {hasEnded && player.hasWon ? (
-              playerWon
-            ) : hasEnded && !player.hasWon ? (
-              playerLost
-            ) : hasEnded && draw ? (
-              <p>draw</p>
-            ) : null}
-          </div>
-          <div className={styles.playerTurn}>
+            </div>
+            <div> Remaining discs : {player.disc}</div>
+            <div>Score : {player.score}</div>
             {player.turn && !hasEnded ? (
-              <p>{player.name}'s turn</p>
+              <div>{player.name}'s turn</div>
             ) : !player.turn && !hasEnded ? (
-              <p>Wait for your turn</p>
+              <div>Wait for your turn</div>
             ) : null}
+            {hasEnded && player.hasWon
+              ? playerWon
+              : hasEnded && !player.hasWon
+              ? playerLost
+              : hasEnded && draw
+              ? draw
+              : null}
           </div>
         </div>
       </div>

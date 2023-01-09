@@ -48,7 +48,7 @@ export default function (
         newWhitePlayer.setTurn(false);
         setBlackPlayer(newBlackPlayer);
         setWhitePlayer(newWhitePlayer);
-        saveSession(newWhitePlayer, newBlackPlayer);
+        saveSession(newWhitePlayer, newBlackPlayer, isAi);
         return;
       }
 
@@ -81,14 +81,14 @@ export default function (
         newAiPlayer.setTurn(true);
         setBlackPlayer(afterBlackPlayer);
         setWhitePlayer(newAiPlayer);
-        saveSession(newAiPlayer, afterBlackPlayer);
+        saveSession(newAiPlayer, afterBlackPlayer, isAi);
         return;
       }
       newAiPlayer.setTurn(false);
       afterBlackPlayer.setTurn(true);
       setWhitePlayer(newAiPlayer);
       setBlackPlayer(afterBlackPlayer);
-      saveSession(newAiPlayer, afterBlackPlayer);
+      saveSession(newAiPlayer, afterBlackPlayer, isAi);
       return;
     }
     const aiBest = aiCalcBestPos(aiLegalMoves(whitePlayer, blackPlayer));
@@ -128,7 +128,7 @@ export default function (
     afterBlackPlayer.setTurn(false);
     setWhitePlayer(newAiPlayer);
     setBlackPlayer(afterBlackPlayer);
-    saveSession(newAiPlayer, afterBlackPlayer);
+    saveSession(newAiPlayer, afterBlackPlayer, isAi);
     return;
   }
 
@@ -159,14 +159,14 @@ export default function (
       newWhitePlayer.setTurn(false);
       setBlackPlayer(newBlackPlayer);
       setWhitePlayer(newWhitePlayer);
-      saveSession(newWhitePlayer, newBlackPlayer);
+      saveSession(newWhitePlayer, newBlackPlayer, isAi);
       return;
     }
     newBlackPlayer.setTurn(false);
     newWhitePlayer.setTurn(true);
     setBlackPlayer(newBlackPlayer);
     setWhitePlayer(newWhitePlayer);
-    saveSession(newWhitePlayer, newBlackPlayer);
+    saveSession(newWhitePlayer, newBlackPlayer, isAi);
     return;
   }
 
@@ -196,17 +196,19 @@ export default function (
     newWhitePlayer.setTurn(true);
     setBlackPlayer(newBlackPlayer);
     setWhitePlayer(newWhitePlayer);
-    saveSession(newWhitePlayer, newBlackPlayer);
+    saveSession(newWhitePlayer, newBlackPlayer, isAi);
     return;
   }
   newWhitePlayer.setTurn(false);
   newBlackPlayer.setTurn(true);
   setWhitePlayer(newWhitePlayer);
   setBlackPlayer(newBlackPlayer);
-  saveSession(newWhitePlayer, newBlackPlayer);
+  saveSession(newWhitePlayer, newBlackPlayer, isAi);
 }
 
-export function saveSession(whitePlayer, blackPlayer) {
+export function saveSession(whitePlayer, blackPlayer, isAi) {
+  sessionStorage.setItem('isAi', isAi);
+  sessionStorage.setItem('togglePopup', true);
   sessionStorage.setItem('playerwName', whitePlayer.name);
   sessionStorage.setItem('playerwType', whitePlayer.type);
   sessionStorage.setItem('playerwTurn', `${whitePlayer.turn}`);

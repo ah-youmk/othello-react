@@ -13,3 +13,21 @@
   border-radius: 50%;
   border: 0.1rem solid #fff;
 }
+
+.whitePrev {
+  width: 50%;
+  height: 50%;
+  background-color: #fff;
+  border-radius: 50%;
+  border: 0.1rem solid #000;
+  opacity: 0.5;
+}
+
+.blackPrev {
+  width: 50%;
+  height: 50%;
+  background-color: #000;
+  border-radius: 50%;
+  border: 0.1rem solid #fff;
+  opacity: 0.5;
+}

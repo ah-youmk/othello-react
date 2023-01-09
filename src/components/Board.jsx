@@ -11,9 +11,12 @@ import {
   checkLegalMoves,
   contains,
 } from '../logic';
+import { aiCalcBestPos, aiLegalMoves } from '../ai';
 
 const columns = [1, 2, 3, 4, 5, 6, 7, 8];
 const rows = [1, 2, 3, 4, 5, 6, 7, 8];
+
+let isAi = true;
 
 export default function Board() {
   const [hasEnded, setHasEnded] = useState(false);
@@ -22,26 +25,25 @@ export default function Board() {
   const [pLegalMoves, setPLegalMoves] = useState([]);
   let divStyle;
 
-  if (whitePlayer.disc <= 0 && blackPlayer.turn) {
-    whitePlayer.turn = false;
-    blackPlayer.turn = true;
-  }
-  if (blackPlayer.disc <= 0 && whitePlayer.turn) {
+  if (blackPlayer.disc <= 0 && blackPlayer.turn) {
     whitePlayer.turn = true;
     blackPlayer.turn = false;
+  }
+  if (whitePlayer.disc <= 0 && whitePlayer.turn) {
+    whitePlayer.turn = false;
+    blackPlayer.turn = true;
   }
   if (
     pLegalMoves.length === 0 &&
     blackPlayer.disc !== 30 &&
-    blackPlayer.disc !== 0 &&
-    whitePlayer.disc !== 30 &&
-    whitePlayer.disc !== 0
+    (blackPlayer.disc !== 0 || whitePlayer.disc !== 0) &&
+    whitePlayer.disc !== 30
   ) {
-    window.alert('turn not changed');
-    if (blackPlayer.turn) {
+    if (blackPlayer.score !== 0 && blackPlayer.turn) {
       whitePlayer.turn = true;
       blackPlayer.turn = false;
-    } else {
+    }
+    if (whitePlayer.turn && whitePlayer.score !== 0) {
       whitePlayer.turn = false;
       blackPlayer.turn = true;
     }
@@ -51,22 +53,34 @@ export default function Board() {
     if (blackPlayer.disc === 0 && whitePlayer.disc === 0) {
       setHasEnded(true);
       divStyle = positionStyles.position;
-      if (blackPlayer.disc > whitePlayer.disc) blackPlayer.hasWon = true;
+      if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
       else whitePlayer.hasWon = true;
       return;
     }
-    if (
-      (blackPlayer.disc <= 0 || whitePlayer.disc <= 0) &&
-      pLegalMoves.length === 0
-    ) {
+    if (blackPlayer.score === 0 || whitePlayer.score === 0) {
       setHasEnded(true);
       return blackPlayer.score > whitePlayer.score
         ? blackPlayer.setHasWon(true)
         : whitePlayer.setHasWon(true);
     }
+
     if (blackPlayer.turn) {
+      const tempLegalMoves = playerLegalMoves(whitePlayer, blackPlayer);
+      if (blackPlayer.disc <= 0 && tempLegalMoves.length === 0) {
+        setHasEnded(true);
+        return blackPlayer.score > whitePlayer.score
+          ? blackPlayer.setHasWon(true)
+          : whitePlayer.setHasWon(true);
+      }
       setPLegalMoves(() => playerLegalMoves(blackPlayer, whitePlayer));
     } else {
+      const tempLegalMoves = playerLegalMoves(blackPlayer, whitePlayer);
+      if (whitePlayer.disc <= 0 && tempLegalMoves.length === 0) {
+        setHasEnded(true);
+        return blackPlayer.score > whitePlayer.score
+          ? blackPlayer.setHasWon(true)
+          : whitePlayer.setHasWon(true);
+      }
       setPLegalMoves(() => playerLegalMoves(whitePlayer, blackPlayer));
     }
 
@@ -83,6 +97,118 @@ export default function Board() {
 
   const updateBoard = (column, row) => {
     if (!contains(pLegalMoves, { col: column, row: row })) {
+      return;
+    }
+    if (isAi) {
+      if (blackPlayer.disc > 0) {
+        const result = calcScoresAll(
+          { col: column, row: row },
+          blackPlayer,
+          whitePlayer
+        );
+        const newBlackPositions = [
+          ...result.newCurrent,
+          { col: column, row: row },
+        ];
+        const newWhitePositions = result.newOpponent;
+        blackPlayer.setPositions(newBlackPositions);
+        whitePlayer.setPositions(newWhitePositions);
+        const newBlackPlayer = new Player(
+          blackPlayer.name,
+          blackPlayer.positions,
+          blackPlayer.type
+        );
+        const newWhitePlayer = new Player(
+          whitePlayer.name,
+          whitePlayer.positions,
+          whitePlayer.type
+        );
+        newBlackPlayer.setDisc(blackPlayer.disc - 1);
+        newWhitePlayer.setDisc(whitePlayer.disc);
+
+        const aiBest = aiCalcBestPos(aiLegalMoves(whitePlayer, blackPlayer));
+        if (aiBest.pos === null) {
+          newBlackPlayer.setTurn(true);
+          newWhitePlayer.setTurn(false);
+          setBlackPlayer(newBlackPlayer);
+          setWhitePlayer(newWhitePlayer);
+          return;
+        }
+
+        const aiResult = calcScoresAll(
+          { col: aiBest.pos.col, row: aiBest.pos.row },
+          whitePlayer,
+          blackPlayer
+        );
+        const newAiPositions = [
+          ...aiResult.newCurrent,
+          { col: aiBest.pos.col, row: aiBest.pos.row },
+        ];
+        const afterAiBlackPositions = aiResult.newOpponent;
+        blackPlayer.setPositions(afterAiBlackPositions);
+        whitePlayer.setPositions(newAiPositions);
+        const newAiPlayer = new Player(
+          whitePlayer.name,
+          whitePlayer.positions,
+          whitePlayer.type
+        );
+        const afterBlackPlayer = new Player(
+          blackPlayer.name,
+          blackPlayer.positions,
+          blackPlayer.type
+        );
+        newAiPlayer.setDisc(whitePlayer.disc - 1);
+        afterBlackPlayer.setDisc(newBlackPlayer.disc);
+        if (blackPlayer.disc <= 0) {
+          afterBlackPlayer.setTurn(false);
+          newAiPlayer.setTurn(true);
+          setBlackPlayer(afterBlackPlayer);
+          setWhitePlayer(newAiPlayer);
+          return;
+        }
+        newAiPlayer.setTurn(false);
+        afterBlackPlayer.setTurn(true);
+        setWhitePlayer(newAiPlayer);
+        setBlackPlayer(afterBlackPlayer);
+        return;
+      }
+      const aiBest = aiCalcBestPos(aiLegalMoves(whitePlayer, blackPlayer));
+
+      if (aiBest.pos === null) {
+        blackPlayer.setTurn(false);
+        whitePlayer.setTurn(true);
+        setBlackPlayer(blackPlayer);
+        setWhitePlayer(whitePlayer);
+        return;
+      }
+      const aiResult = calcScoresAll(
+        { col: aiBest.pos.col, row: aiBest.pos.row },
+        whitePlayer,
+        blackPlayer
+      );
+      const newAiPositions = [
+        ...aiResult.newCurrent,
+        { col: aiBest.pos.col, row: aiBest.pos.row },
+      ];
+      const afterAiBlackPositions = aiResult.newOpponent;
+      blackPlayer.setPositions(afterAiBlackPositions);
+      whitePlayer.setPositions(newAiPositions);
+      const newAiPlayer = new Player(
+        whitePlayer.name,
+        whitePlayer.positions,
+        whitePlayer.type
+      );
+      const afterBlackPlayer = new Player(
+        blackPlayer.name,
+        blackPlayer.positions,
+        blackPlayer.type
+      );
+      newAiPlayer.setDisc(whitePlayer.disc - 1);
+      afterBlackPlayer.setDisc(blackPlayer.disc);
+      newAiPlayer.setTurn(true);
+      afterBlackPlayer.setTurn(false);
+      setWhitePlayer(newAiPlayer);
+      setBlackPlayer(afterBlackPlayer);
       return;
     }
 
@@ -210,7 +336,7 @@ function playerLegalMoves(currentPlayer, opponentPlayer) {
   });
   for (const pos of pAvailbaleMoves) {
     if (
-      checkLegalMoves(pos, currentPlayer, opponentPlayer) &&
+      checkLegalMoves(pos, currentPlayer, opponentPlayer).isLegal &&
       !contains(pLegalMoves, pos)
     ) {
       pLegalMoves.push(pos);

@@ -22,11 +22,11 @@ export default function PlayerInfo({ player, hasEnded }) {
             )}
           </div>
           <div className={styles.playerTurn}>
-            {player.turn ? (
+            {player.turn && !hasEnded ? (
               <p>{player.name}'s turn</p>
-            ) : (
+            ) : !player.turn && !hasEnded ? (
               <p>Wait for your turn</p>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

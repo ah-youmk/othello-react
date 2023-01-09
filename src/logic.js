@@ -211,18 +211,45 @@ export const checkLegalMoves = (pos, currentPlayer, opponentPlayer) => {
     return false;
   }
   let isLegal = 0;
+  let score = 0;
   const sidePos = calcSidePos(pos);
 
-  if (checkLegal(sidePos, 4, currentPlayer, opponentPlayer)[1]) isLegal++;
-  if (checkLegal(sidePos, 5, currentPlayer, opponentPlayer)[1]) isLegal++;
-  if (checkLegal(sidePos, 2, currentPlayer, opponentPlayer)[1]) isLegal++;
-  if (checkLegal(sidePos, 7, currentPlayer, opponentPlayer)[1]) isLegal++;
-  if (checkLegal(sidePos, 1, currentPlayer, opponentPlayer)[1]) isLegal++;
-  if (checkLegal(sidePos, 8, currentPlayer, opponentPlayer)[1]) isLegal++;
-  if (checkLegal(sidePos, 3, currentPlayer, opponentPlayer)[1]) isLegal++;
-  if (checkLegal(sidePos, 6, currentPlayer, opponentPlayer)[1]) isLegal++;
+  if (checkLegal(sidePos, 4, currentPlayer, opponentPlayer)[1]) {
+    score += checkLegal(sidePos, 4, currentPlayer, opponentPlayer)[0];
+    isLegal++;
+  }
+  if (checkLegal(sidePos, 5, currentPlayer, opponentPlayer)[1]) {
+    score += checkLegal(sidePos, 5, currentPlayer, opponentPlayer)[0];
+    isLegal++;
+  }
+  if (checkLegal(sidePos, 2, currentPlayer, opponentPlayer)[1]) {
+    score += checkLegal(sidePos, 2, currentPlayer, opponentPlayer)[0];
+    isLegal++;
+  }
+  if (checkLegal(sidePos, 7, currentPlayer, opponentPlayer)[1]) {
+    score += checkLegal(sidePos, 7, currentPlayer, opponentPlayer)[0];
+    isLegal++;
+  }
+  if (checkLegal(sidePos, 3, currentPlayer, opponentPlayer)[1]) {
+    score += checkLegal(sidePos, 3, currentPlayer, opponentPlayer)[0];
+    isLegal++;
+  }
+  if (checkLegal(sidePos, 6, currentPlayer, opponentPlayer)[1]) {
+    score += checkLegal(sidePos, 6, currentPlayer, opponentPlayer)[0];
+    isLegal++;
+  }
+  if (checkLegal(sidePos, 1, currentPlayer, opponentPlayer)[1]) {
+    score += checkLegal(sidePos, 1, currentPlayer, opponentPlayer)[0];
+    isLegal++;
+  }
+  if (checkLegal(sidePos, 8, currentPlayer, opponentPlayer)[1]) {
+    score += checkLegal(sidePos, 8, currentPlayer, opponentPlayer)[0];
+    isLegal++;
+  }
 
-  return isLegal > 0 ? true : false;
+  return isLegal > 0
+    ? { isLegal: true, score: score }
+    : { isLegal: false, score: score };
 };
 
 export const calcPAvailbaleMoves = (sidePos, currentPlayer, opponentPlayer) => {

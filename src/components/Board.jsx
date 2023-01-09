@@ -2,15 +2,15 @@ import Position from './Position';
 import PlayerInfo from './PlayerInfo';
 import styles from './Board.module.css';
 import positionStyles from './Position.module.css';
-import { playerBlack, playerWhite } from '../js/playerStatus';
+import { Player, playerBlack, playerWhite } from '../js/playerStatus';
 import { useState, useEffect } from 'react';
 import { contains, playerLegalMoves } from '../js/logic';
-import updateState from '../js/updateState';
+import updateState, { saveSession } from '../js/updateState';
 
 const columns = [1, 2, 3, 4, 5, 6, 7, 8];
 const rows = [1, 2, 3, 4, 5, 6, 7, 8];
 
-let isAi = true;
+let isAi = false;
 
 export default function Board() {
   const [hasEnded, setHasEnded] = useState(false);
@@ -18,6 +18,7 @@ export default function Board() {
   const [whitePlayer, setWhitePlayer] = useState(playerWhite);
   const [pLegalMoves, setPLegalMoves] = useState([]);
   let divStyle;
+  let draw = false;
 
   if (blackPlayer.disc <= 0 && blackPlayer.turn) {
     whitePlayer.turn = true;
@@ -36,8 +37,7 @@ export default function Board() {
     if (blackPlayer.score !== 0 && blackPlayer.turn) {
       whitePlayer.turn = true;
       blackPlayer.turn = false;
-    }
-    if (whitePlayer.turn && whitePlayer.score !== 0) {
+    } else if (whitePlayer.turn && whitePlayer.score !== 0) {
       whitePlayer.turn = false;
       blackPlayer.turn = true;
     }
@@ -48,34 +48,84 @@ export default function Board() {
       setHasEnded(true);
       divStyle = positionStyles.position;
       if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
-      else whitePlayer.hasWon = true;
+      else if (blackPlayer.score < whitePlayer.score) whitePlayer.hasWon = true;
+      else draw = true;
+      saveSession(whitePlayer, blackPlayer);
       return;
     }
     if (blackPlayer.score === 0 || whitePlayer.score === 0) {
       setHasEnded(true);
-      return blackPlayer.score > whitePlayer.score
-        ? blackPlayer.setHasWon(true)
-        : whitePlayer.setHasWon(true);
+      if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
+      else if (blackPlayer.score < whitePlayer.score) whitePlayer.hasWon = true;
+      else draw = true;
+      saveSession(whitePlayer, blackPlayer);
+      return;
     }
 
     if (blackPlayer.turn) {
       const tempLegalMoves = playerLegalMoves(whitePlayer, blackPlayer);
       if (blackPlayer.disc <= 0 && tempLegalMoves.length === 0) {
         setHasEnded(true);
-        return blackPlayer.score > whitePlayer.score
-          ? blackPlayer.setHasWon(true)
-          : whitePlayer.setHasWon(true);
+        if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
+        else if (blackPlayer.score < whitePlayer.score)
+          whitePlayer.hasWon = true;
+        else draw = true;
+        saveSession(whitePlayer, blackPlayer);
+        return;
+      }
+      if (pLegalMoves.length <= 0 && tempLegalMoves.length === 0) {
+        setHasEnded(true);
+        if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
+        else if (blackPlayer.score < whitePlayer.score)
+          whitePlayer.hasWon = true;
+        else draw = true;
+        saveSession(whitePlayer, blackPlayer);
+        return;
       }
       setPLegalMoves(() => playerLegalMoves(blackPlayer, whitePlayer));
     } else {
       const tempLegalMoves = playerLegalMoves(blackPlayer, whitePlayer);
       if (whitePlayer.disc <= 0 && tempLegalMoves.length === 0) {
         setHasEnded(true);
-        return blackPlayer.score > whitePlayer.score
-          ? blackPlayer.setHasWon(true)
-          : whitePlayer.setHasWon(true);
+        if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
+        else if (blackPlayer.score < whitePlayer.score)
+          whitePlayer.hasWon = true;
+        else draw = true;
+        saveSession(whitePlayer, blackPlayer);
+        return;
+      }
+      if (pLegalMoves.length <= 0 && tempLegalMoves.length === 0) {
+        setHasEnded(true);
+        if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
+        else if (blackPlayer.score < whitePlayer.score)
+          whitePlayer.hasWon = true;
+        else draw = true;
+        saveSession(whitePlayer, blackPlayer);
+        return;
       }
       setPLegalMoves(() => playerLegalMoves(whitePlayer, blackPlayer));
+    }
+    if (sessionStorage.getItem('playerwPositions')) {
+      const newWhite = new Player(
+        sessionStorage.getItem('playerwName'),
+        JSON.parse(sessionStorage.getItem('playerwPositions')),
+        'white'
+      );
+      newWhite.setDisc(JSON.parse(sessionStorage.getItem('playerwDisc')));
+      newWhite.setTurn(JSON.parse(sessionStorage.getItem('playerwTurn')));
+      newWhite.setHasWon(JSON.parse(sessionStorage.getItem('playerwHasWon')));
+      setWhitePlayer(newWhite);
+    }
+    if (sessionStorage.getItem('playerbPositions')) {
+      const newBlack = new Player(
+        sessionStorage.getItem('playerbName'),
+        JSON.parse(sessionStorage.getItem('playerbPositions')),
+        'black'
+      );
+      newBlack.setDisc(JSON.parse(sessionStorage.getItem('playerbDisc')));
+      newBlack.setTurn(JSON.parse(sessionStorage.getItem('playerbTurn')));
+      newBlack.setHasWon(JSON.parse(sessionStorage.getItem('playerbHasWon')));
+      setBlackPlayer(newBlack);
     }
 
     return () => {
@@ -92,7 +142,7 @@ export default function Board() {
   return (
     <>
       <div className={styles.container}>
-        <PlayerInfo player={blackPlayer} hasEnded={hasEnded} />
+        <PlayerInfo player={blackPlayer} hasEnded={hasEnded} draw={draw} />
 
         <div className={styles.boardContainer}>
           <div className={styles.board}>
@@ -134,7 +184,7 @@ export default function Board() {
           </div>
         </div>
 
-        <PlayerInfo player={whitePlayer} hasEnded={hasEnded} />
+        <PlayerInfo player={whitePlayer} hasEnded={hasEnded} draw={draw} />
       </div>
     </>
   );

@@ -1,6 +1,6 @@
 import styles from './Board.module.css';
 
-export default function PlayerInfo({ player, hasEnded }) {
+export default function PlayerInfo({ player, hasEnded, draw }) {
   const playerWon = <p>{player.name} has won</p>;
   const playerLost = <p>{player.name} has lost</p>;
   return (
@@ -17,9 +17,9 @@ export default function PlayerInfo({ player, hasEnded }) {
               playerWon
             ) : hasEnded && !player.hasWon ? (
               playerLost
-            ) : (
-              <p></p>
-            )}
+            ) : hasEnded && draw ? (
+              <p>draw</p>
+            ) : null}
           </div>
           <div className={styles.playerTurn}>
             {player.turn && !hasEnded ? (

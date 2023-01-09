@@ -14,9 +14,9 @@ body {
 
 .board {
   display: grid;
-  height: 635px;
-  grid-template-columns: repeat(8, 75px);
-  grid-template-rows: repeat(8, 75px);
+  height: 440px;
+  grid-template-columns: repeat(8, 55px);
+  grid-template-rows: repeat(8, 55px);
   margin: auto;
   gap: 5px;
 }

@@ -48,6 +48,7 @@ export default function (
         newWhitePlayer.setTurn(false);
         setBlackPlayer(newBlackPlayer);
         setWhitePlayer(newWhitePlayer);
+        saveSession(newWhitePlayer, newBlackPlayer);
         return;
       }
 
@@ -80,12 +81,14 @@ export default function (
         newAiPlayer.setTurn(true);
         setBlackPlayer(afterBlackPlayer);
         setWhitePlayer(newAiPlayer);
+        saveSession(newAiPlayer, afterBlackPlayer);
         return;
       }
       newAiPlayer.setTurn(false);
       afterBlackPlayer.setTurn(true);
       setWhitePlayer(newAiPlayer);
       setBlackPlayer(afterBlackPlayer);
+      saveSession(newAiPlayer, afterBlackPlayer);
       return;
     }
     const aiBest = aiCalcBestPos(aiLegalMoves(whitePlayer, blackPlayer));
@@ -125,6 +128,7 @@ export default function (
     afterBlackPlayer.setTurn(false);
     setWhitePlayer(newAiPlayer);
     setBlackPlayer(afterBlackPlayer);
+    saveSession(newAiPlayer, afterBlackPlayer);
     return;
   }
 
@@ -155,12 +159,14 @@ export default function (
       newWhitePlayer.setTurn(false);
       setBlackPlayer(newBlackPlayer);
       setWhitePlayer(newWhitePlayer);
+      saveSession(newWhitePlayer, newBlackPlayer);
       return;
     }
     newBlackPlayer.setTurn(false);
     newWhitePlayer.setTurn(true);
     setBlackPlayer(newBlackPlayer);
     setWhitePlayer(newWhitePlayer);
+    saveSession(newWhitePlayer, newBlackPlayer);
     return;
   }
 
@@ -190,10 +196,35 @@ export default function (
     newWhitePlayer.setTurn(true);
     setBlackPlayer(newBlackPlayer);
     setWhitePlayer(newWhitePlayer);
+    saveSession(newWhitePlayer, newBlackPlayer);
     return;
   }
   newWhitePlayer.setTurn(false);
   newBlackPlayer.setTurn(true);
   setWhitePlayer(newWhitePlayer);
   setBlackPlayer(newBlackPlayer);
+  saveSession(newWhitePlayer, newBlackPlayer);
+}
+
+export function saveSession(whitePlayer, blackPlayer) {
+  sessionStorage.setItem('playerwName', whitePlayer.name);
+  sessionStorage.setItem('playerwType', whitePlayer.type);
+  sessionStorage.setItem('playerwTurn', `${whitePlayer.turn}`);
+  sessionStorage.setItem('playerwScore', `${whitePlayer.score}`);
+  sessionStorage.setItem('playerwDisc', `${whitePlayer.disc}`);
+  sessionStorage.setItem('playerwHasWon', whitePlayer.hasWon);
+  sessionStorage.setItem(
+    'playerwPositions',
+    JSON.stringify(whitePlayer.positions)
+  );
+  sessionStorage.setItem('playerbName', blackPlayer.name);
+  sessionStorage.setItem('playerbType', blackPlayer.type);
+  sessionStorage.setItem('playerbTurn', blackPlayer.turn);
+  sessionStorage.setItem('playerbScore', blackPlayer.score);
+  sessionStorage.setItem('playerbDisc', blackPlayer.disc);
+  sessionStorage.setItem('playerbHasWon', blackPlayer.hasWon);
+  sessionStorage.setItem(
+    'playerbPositions',
+    JSON.stringify(blackPlayer.positions)
+  );
 }

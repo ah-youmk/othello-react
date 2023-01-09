@@ -266,3 +266,24 @@ export const calcPAvailbaleMoves = (sidePos, currentPlayer, opponentPlayer) => {
   });
   return pAvailbaleMoves;
 };
+
+export function playerLegalMoves(currentPlayer, opponentPlayer) {
+  const pLegalMoves = [];
+  let pAvailbaleMoves = [];
+  opponentPlayer.positions.forEach((position) => {
+    pAvailbaleMoves = [
+      ...pAvailbaleMoves,
+      ...calcPAvailbaleMoves(position, currentPlayer, opponentPlayer),
+    ];
+  });
+  for (const pos of pAvailbaleMoves) {
+    if (
+      checkLegalMoves(pos, currentPlayer, opponentPlayer).isLegal &&
+      !contains(pLegalMoves, pos)
+    ) {
+      pLegalMoves.push(pos);
+    }
+  }
+
+  return pLegalMoves;
+}

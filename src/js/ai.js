@@ -1,7 +1,5 @@
 import { calcPAvailbaleMoves, checkLegalMoves, contains } from './logic';
 
-const aiFunction = () => {};
-
 export function aiLegalMoves(ai, player) {
   const aiLegalMoves = [];
   let aiAvailbaleMoves = [];

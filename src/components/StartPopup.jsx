@@ -7,6 +7,7 @@ export default function StartPopup({
   setTogglePopup,
   setBlackPlayer,
   setWhitePlayer,
+  setHasEnded,
   setIsAi,
 }) {
   const [blackPlayerName, setPlayerBlackName] = useState('');
@@ -34,7 +35,7 @@ export default function StartPopup({
     setBlackPlayer(blackPlayer);
     setWhitePlayer(ai);
     saveSession(ai, blackPlayer, true);
-    console.log(JSON.parse(sessionStorage.getItem('isAi')));
+    setHasEnded(false);
     setTogglePopup(false);
   };
   const twoPlayer = () => {
@@ -59,6 +60,7 @@ export default function StartPopup({
     setBlackPlayer(blackPlayer);
     setWhitePlayer(whitePlayer);
     saveSession(whitePlayer, blackPlayer, false);
+    setHasEnded(false);
     setTogglePopup(false);
   };
 

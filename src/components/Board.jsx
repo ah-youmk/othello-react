@@ -217,6 +217,7 @@ export default function Board() {
           setTogglePopup={setTogglePopup}
           setBlackPlayer={setBlackPlayer}
           setWhitePlayer={setWhitePlayer}
+          setHasEnded={setHasEnded}
           setIsAi={setIsAi}
         />
       ) : null}

@@ -11,35 +11,21 @@ const columns = [1, 2, 3, 4, 5, 6, 7, 8];
 const rows = [1, 2, 3, 4, 5, 6, 7, 8];
 
 export default function Board() {
+  const [isChanged, setIsChanged] = useState(false);
   const [hasEnded, setHasEnded] = useState(false);
   const [blackPlayer, setBlackPlayer] = useState(playerBlack);
   const [whitePlayer, setWhitePlayer] = useState(playerWhite);
-  const [pLegalMoves, setPLegalMoves] = useState([]);
+  const [pLegalMoves, setPLegalMoves] = useState(
+    playerLegalMoves(blackPlayer, whitePlayer)
+  );
   const [togglePopup, setTogglePopup] = useState(true);
   const [isAi, setIsAi] = useState(false);
+  const [difficulty, setDifficulty] = useState('');
   let draw = false;
 
-  if (blackPlayer.disc <= 0 && blackPlayer.turn) {
-    whitePlayer.turn = true;
-    blackPlayer.turn = false;
-  }
-  if (whitePlayer.disc <= 0 && whitePlayer.turn) {
-    whitePlayer.turn = false;
-    blackPlayer.turn = true;
-  }
-  if (
-    pLegalMoves.length === 0 &&
-    blackPlayer.disc !== 30 &&
-    (blackPlayer.disc !== 0 || whitePlayer.disc !== 0) &&
-    whitePlayer.disc !== 30
-  ) {
-    if (blackPlayer.score !== 0 && blackPlayer.turn) {
-      whitePlayer.turn = true;
-      blackPlayer.turn = false;
-    } else if (whitePlayer.turn && whitePlayer.score !== 0) {
-      whitePlayer.turn = false;
-      blackPlayer.turn = true;
-    }
+  if (isChanged) {
+    blackPlayer.turn = !blackPlayer.turn;
+    whitePlayer.turn = !whitePlayer.turn;
   }
 
   useEffect(() => {
@@ -49,7 +35,7 @@ export default function Board() {
       if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
       else if (blackPlayer.score < whitePlayer.score) whitePlayer.hasWon = true;
       else draw = true;
-      saveSession(whitePlayer, blackPlayer, isAi);
+      saveSession(whitePlayer, blackPlayer, isAi, difficulty);
       return;
     }
     if (blackPlayer.score === 0 || whitePlayer.score === 0) {
@@ -58,7 +44,7 @@ export default function Board() {
       if (blackPlayer.score > whitePlayer.score) blackPlayer.hasWon = true;
       else if (blackPlayer.score < whitePlayer.score) whitePlayer.hasWon = true;
       else draw = true;
-      saveSession(whitePlayer, blackPlayer, isAi);
+      saveSession(whitePlayer, blackPlayer, isAi, difficulty);
       return;
     }
 
@@ -71,7 +57,7 @@ export default function Board() {
         else if (blackPlayer.score < whitePlayer.score)
           whitePlayer.hasWon = true;
         else draw = true;
-        saveSession(whitePlayer, blackPlayer, isAi);
+        saveSession(whitePlayer, blackPlayer, isAi, difficulty);
         return;
       }
       if (pLegalMoves.length <= 0 && tempLegalMoves.length === 0) {
@@ -81,7 +67,11 @@ export default function Board() {
         else if (blackPlayer.score < whitePlayer.score)
           whitePlayer.hasWon = true;
         else draw = true;
-        saveSession(whitePlayer, blackPlayer, isAi);
+        saveSession(whitePlayer, blackPlayer, isAi, difficulty);
+        return;
+      }
+      if (playerLegalMoves(blackPlayer, whitePlayer).length <= 0) {
+        setIsChanged(true);
         return;
       }
       setPLegalMoves(() => playerLegalMoves(blackPlayer, whitePlayer));
@@ -94,7 +84,7 @@ export default function Board() {
         else if (blackPlayer.score < whitePlayer.score)
           whitePlayer.hasWon = true;
         else draw = true;
-        saveSession(whitePlayer, blackPlayer, isAi);
+        saveSession(whitePlayer, blackPlayer, isAi, difficulty);
         return;
       }
       if (pLegalMoves.length <= 0 && tempLegalMoves.length === 0) {
@@ -104,7 +94,11 @@ export default function Board() {
         else if (blackPlayer.score < whitePlayer.score)
           whitePlayer.hasWon = true;
         else draw = true;
-        saveSession(whitePlayer, blackPlayer, isAi);
+        saveSession(whitePlayer, blackPlayer, isAi, difficulty);
+        return;
+      }
+      if (playerLegalMoves(whitePlayer, blackPlayer).length <= 0) {
+        setIsChanged(true);
         return;
       }
       setPLegalMoves(() => playerLegalMoves(whitePlayer, blackPlayer));
@@ -124,6 +118,7 @@ export default function Board() {
       newWhite.setTurn(JSON.parse(sessionStorage.getItem('playerwTurn')));
       newWhite.setHasWon(JSON.parse(sessionStorage.getItem('playerwHasWon')));
       setWhitePlayer(newWhite);
+      setDifficulty(sessionStorage.getItem('difficulty'));
     }
     if (
       sessionStorage.getItem('playerbPositions') ||
@@ -137,6 +132,7 @@ export default function Board() {
       newBlack.setDisc(JSON.parse(sessionStorage.getItem('playerbDisc')));
       newBlack.setTurn(JSON.parse(sessionStorage.getItem('playerbTurn')));
       newBlack.setHasWon(JSON.parse(sessionStorage.getItem('playerbHasWon')));
+      setDifficulty(sessionStorage.getItem('difficulty'));
       setBlackPlayer(newBlack);
     }
 
@@ -190,8 +186,11 @@ export default function Board() {
                           column,
                           row,
                           isAi,
+                          difficulty,
                           setBlackPlayer,
-                          setWhitePlayer
+                          setWhitePlayer,
+                          isChanged,
+                          setIsChanged
                         )
                       }
                       pLegalMoves={pLegalMoves}
@@ -219,6 +218,7 @@ export default function Board() {
           setWhitePlayer={setWhitePlayer}
           setHasEnded={setHasEnded}
           setIsAi={setIsAi}
+          diff={setDifficulty}
         />
       ) : null}
     </>

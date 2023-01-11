@@ -9,9 +9,15 @@ export default function (
   column,
   row,
   isAi,
+  difficulty,
   setBlackPlayer,
-  setWhitePlayer
+  setWhitePlayer,
+  isChanged,
+  setIsChanged
 ) {
+  if (isChanged) {
+    setIsChanged(false);
+  }
   if (!contains(pLegalMoves, { col: column, row: row })) {
     return;
   }
@@ -42,13 +48,16 @@ export default function (
       newBlackPlayer.setDisc(blackPlayer.disc - 1);
       newWhitePlayer.setDisc(whitePlayer.disc);
 
-      const aiBest = aiCalcBestPos(aiLegalMoves(whitePlayer, blackPlayer));
+      const aiBest = aiCalcBestPos(
+        aiLegalMoves(whitePlayer, blackPlayer),
+        difficulty
+      );
       if (aiBest.pos === null) {
         newBlackPlayer.setTurn(true);
         newWhitePlayer.setTurn(false);
         setBlackPlayer(newBlackPlayer);
         setWhitePlayer(newWhitePlayer);
-        saveSession(newWhitePlayer, newBlackPlayer, isAi);
+        saveSession(newWhitePlayer, newBlackPlayer, isAi, difficulty);
         return;
       }
 
@@ -81,17 +90,20 @@ export default function (
         newAiPlayer.setTurn(true);
         setBlackPlayer(afterBlackPlayer);
         setWhitePlayer(newAiPlayer);
-        saveSession(newAiPlayer, afterBlackPlayer, isAi);
+        saveSession(newAiPlayer, afterBlackPlayer, isAi, difficulty);
         return;
       }
       newAiPlayer.setTurn(false);
       afterBlackPlayer.setTurn(true);
       setWhitePlayer(newAiPlayer);
       setBlackPlayer(afterBlackPlayer);
-      saveSession(newAiPlayer, afterBlackPlayer, isAi);
+      saveSession(newAiPlayer, afterBlackPlayer, isAi, difficulty);
       return;
     }
-    const aiBest = aiCalcBestPos(aiLegalMoves(whitePlayer, blackPlayer));
+    const aiBest = aiCalcBestPos(
+      aiLegalMoves(whitePlayer, blackPlayer),
+      difficulty
+    );
 
     if (aiBest.pos === null) {
       blackPlayer.setTurn(false);
@@ -128,7 +140,7 @@ export default function (
     afterBlackPlayer.setTurn(false);
     setWhitePlayer(newAiPlayer);
     setBlackPlayer(afterBlackPlayer);
-    saveSession(newAiPlayer, afterBlackPlayer, isAi);
+    saveSession(newAiPlayer, afterBlackPlayer, isAi, difficulty);
     return;
   }
 
@@ -159,14 +171,14 @@ export default function (
       newWhitePlayer.setTurn(false);
       setBlackPlayer(newBlackPlayer);
       setWhitePlayer(newWhitePlayer);
-      saveSession(newWhitePlayer, newBlackPlayer, isAi);
+      saveSession(newWhitePlayer, newBlackPlayer, isAi, difficulty);
       return;
     }
     newBlackPlayer.setTurn(false);
     newWhitePlayer.setTurn(true);
     setBlackPlayer(newBlackPlayer);
     setWhitePlayer(newWhitePlayer);
-    saveSession(newWhitePlayer, newBlackPlayer, isAi);
+    saveSession(newWhitePlayer, newBlackPlayer, isAi, difficulty);
     return;
   }
 
@@ -196,18 +208,19 @@ export default function (
     newWhitePlayer.setTurn(true);
     setBlackPlayer(newBlackPlayer);
     setWhitePlayer(newWhitePlayer);
-    saveSession(newWhitePlayer, newBlackPlayer, isAi);
+    saveSession(newWhitePlayer, newBlackPlayer, isAi, difficulty);
     return;
   }
   newWhitePlayer.setTurn(false);
   newBlackPlayer.setTurn(true);
   setWhitePlayer(newWhitePlayer);
   setBlackPlayer(newBlackPlayer);
-  saveSession(newWhitePlayer, newBlackPlayer, isAi);
+  saveSession(newWhitePlayer, newBlackPlayer, isAi, difficulty);
 }
 
-export function saveSession(whitePlayer, blackPlayer, isAi) {
+export function saveSession(whitePlayer, blackPlayer, isAi, difficulty) {
   sessionStorage.setItem('isAi', isAi);
+  sessionStorage.setItem('difficulty', difficulty);
   sessionStorage.setItem('togglePopup', true);
   sessionStorage.setItem('playerwName', whitePlayer.name);
   sessionStorage.setItem('playerwType', whitePlayer.type);

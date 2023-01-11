@@ -9,9 +9,11 @@ export default function StartPopup({
   setWhitePlayer,
   setHasEnded,
   setIsAi,
+  diff,
 }) {
   const [blackPlayerName, setPlayerBlackName] = useState('');
   const [whitePlayerName, setPlayerWhiteName] = useState('');
+  const [difficulty, setDifficulty] = useState('easy');
 
   const aiPlay = () => {
     const ai = new Player(
@@ -34,8 +36,9 @@ export default function StartPopup({
     setIsAi(true);
     setBlackPlayer(blackPlayer);
     setWhitePlayer(ai);
-    saveSession(ai, blackPlayer, true);
+    saveSession(ai, blackPlayer, true, difficulty);
     setHasEnded(false);
+    diff(difficulty);
     setTogglePopup(false);
   };
   const twoPlayer = () => {
@@ -59,7 +62,7 @@ export default function StartPopup({
     setIsAi(false);
     setBlackPlayer(blackPlayer);
     setWhitePlayer(whitePlayer);
-    saveSession(whitePlayer, blackPlayer, false);
+    saveSession(whitePlayer, blackPlayer, false, null);
     setHasEnded(false);
     setTogglePopup(false);
   };
@@ -85,6 +88,18 @@ export default function StartPopup({
               </div>
             </div>
             <div className={styles.ai_info}>
+              <div>
+                <span>Select a difficulty</span>
+                <select
+                  onChange={(e) => setDifficulty(e.target.value)}
+                  value={difficulty}
+                >
+                  <option value="easy">Easy</option>
+                  <option value="normal">Normal</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
+              <br />
               <button onClick={aiPlay}>Play</button>
             </div>
           </div>

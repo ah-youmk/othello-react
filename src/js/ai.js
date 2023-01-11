@@ -24,13 +24,37 @@ export function aiLegalMoves(ai, player) {
   return aiLegalMoves;
 }
 
-export const aiCalcBestPos = (aiLegalMoves) => {
-  let best = { pos: null, score: 0 };
-  aiLegalMoves.forEach((item) => {
-    if (item.score > best.score) {
-      best = item;
-    }
-  });
+export const aiCalcBestPos = (aiLegalMoves, diff) => {
+  let move = { pos: null, score: 0 };
+  switch (diff) {
+    case 'easy':
+      move.score = 99;
+      aiLegalMoves.forEach((item) => {
+        if (item.score < move.score) {
+          move = item;
+        }
+      });
+      break;
+    case 'normal':
+      const scores = [];
+      aiLegalMoves.forEach((item) => scores.push(item.score));
+      scores.sort((a, b) => a - b);
+      const moveScore =
+        scores.length % 2 === 0
+          ? scores[scores.length / 2 - 1]
+          : scores[(scores.length + 1) / 2 - 1];
+      aiLegalMoves.forEach((item) => {
+        if (item.score === moveScore) move = item;
+      });
+      break;
+    default:
+      aiLegalMoves.forEach((item) => {
+        if (item.score > move.score) {
+          move = item;
+        }
+      });
+      break;
+  }
 
-  return best;
+  return move;
 };
